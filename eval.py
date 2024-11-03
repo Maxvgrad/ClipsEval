@@ -37,7 +37,7 @@ def main(args):
             image_id = int(row['image_id'])
             box = json.loads(row['box'])  # Assuming box is saved as a JSON list in the CSV file
             score = float(row['score'])
-            label = int(row['label'])
+            label = int(row['label']) + 1 # TODO: move outside of the library
 
             # Store results in the nested dictionary structure
             if image_id not in results[experiment][frame_number]:
@@ -50,18 +50,21 @@ def main(args):
             results[experiment][frame_number][image_id]["scores"].append(score)
             results[experiment][frame_number][image_id]["labels"].append(label)
 
-    coco_evaluators_per_experiment_and_timestamp = defaultdict(lambda: defaultdict(dict))
+    coco_evaluators_per_experiment_and_timestamp = {}
     coco = COCO(args.annotation_file)
 
     stats = {}
-
     for experiment, experiment_results in results.items():
+        if experiment not in coco_evaluators_per_experiment_and_timestamp:
+            coco_evaluators_per_experiment_and_timestamp[experiment] = {}
+
         for frame_number, r in experiment_results.items():
             if frame_number not in coco_evaluators_per_experiment_and_timestamp[experiment]:
                 coco_evaluators_per_experiment_and_timestamp[experiment][frame_number] = CocoEvaluator(coco)
 
             ce = coco_evaluators_per_experiment_and_timestamp[experiment][frame_number]
             ce.update(r)
+            ce.evaluate()
             ce.accumulate()
             ce.summarize()
 
