@@ -14,6 +14,7 @@ def get_args_parser():
     parser = argparse.ArgumentParser('ClipsEval', add_help=False)
     parser.add_argument('--annotation_file', type=str)
     parser.add_argument('--result_file', type=str)
+    return parser
 
 
 def main(args):
