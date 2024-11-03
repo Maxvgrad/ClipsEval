@@ -1,0 +1,6 @@
+name: clips_object_detection_eval
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - conda-forge::pycocotools
