@@ -33,22 +33,22 @@ def main(args):
         reader = csv.DictReader(csvfile)
         for row in reader:
             experiment = row['experiment']
-            timestamp = int(row['timestamp'])
+            frame_number = int(row['frame_number'])
             image_id = int(row['image_id'])
             box = json.loads(row['box'])  # Assuming box is saved as a JSON list in the CSV file
             score = float(row['score'])
             label = int(row['label'])
 
             # Store results in the nested dictionary structure
-            if image_id not in results[experiment][timestamp]:
-                results[experiment][timestamp][image_id] = {
+            if image_id not in results[experiment][frame_number]:
+                results[experiment][frame_number][image_id] = {
                     "boxes": [],
                     "scores": [],
                     "labels": []
                 }
-            results[experiment][timestamp][image_id]["boxes"].append(box)
-            results[experiment][timestamp][image_id]["scores"].append(score)
-            results[experiment][timestamp][image_id]["labels"].append(label)
+            results[experiment][frame_number][image_id]["boxes"].append(box)
+            results[experiment][frame_number][image_id]["scores"].append(score)
+            results[experiment][frame_number][image_id]["labels"].append(label)
 
     coco_evaluators_per_experiment_and_timestamp = defaultdict(lambda: defaultdict(dict))
     coco = COCO(args.annotation_file)
@@ -56,16 +56,16 @@ def main(args):
     stats = {}
 
     for experiment, experiment_results in results.items():
-        for timestamp, r in results.items():
-            if timestamp not in coco_evaluators_per_experiment_and_timestamp[experiment]:
-                coco_evaluators_per_experiment_and_timestamp[experiment][timestamp] = CocoEvaluator(coco)
+        for frame_number, r in results.items():
+            if frame_number not in coco_evaluators_per_experiment_and_timestamp[experiment]:
+                coco_evaluators_per_experiment_and_timestamp[experiment][frame_number] = CocoEvaluator(coco)
 
-            ce = coco_evaluators_per_experiment_and_timestamp[experiment][timestamp]
+            ce = coco_evaluators_per_experiment_and_timestamp[experiment][frame_number]
             ce.update(r)
             ce.accumulate()
             ce.summarize()
 
-            stats[f'coco_eval_bbox_{experiment}_{timestamp}'] = ce.coco_eval['bbox'].stats.tolist()
+            stats[f'coco_eval_bbox_{experiment}_{frame_number}'] = ce.coco_eval['bbox'].stats.tolist()
 
     flat_stats_result = flat_stats(stats)
 
