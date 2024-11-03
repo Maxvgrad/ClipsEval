@@ -56,7 +56,7 @@ def main(args):
     stats = {}
 
     for experiment, experiment_results in results.items():
-        for frame_number, r in results.items():
+        for frame_number, r in experiment_results.items():
             if frame_number not in coco_evaluators_per_experiment_and_timestamp[experiment]:
                 coco_evaluators_per_experiment_and_timestamp[experiment][frame_number] = CocoEvaluator(coco)
 
