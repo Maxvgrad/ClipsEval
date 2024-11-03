@@ -1,4 +1,4 @@
-name: clips_object_detection_eval
+name: clips_eval
 channels:
   - defaults
 dependencies:
