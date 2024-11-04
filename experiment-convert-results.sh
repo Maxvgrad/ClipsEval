@@ -53,11 +53,9 @@ conda activate clips_eval
 # Debug Information
 #----------------------------------------
 
-echo "output_dir=$output_dir"
-echo "resume=$resume"
-echo "resume_optim=$resume_optim"
-echo "wandb_id=$wandb_id"
-
+echo "annotation_file=$annotation_file"
+echo "result_files=$result_files"
+echo "output_file=$output_file"
 
 for result_file in "${result_files[@]}"; do
   result_file_dir="$(dirname "$result_file")"
@@ -73,4 +71,5 @@ for result_file in "${result_files[@]}"; do
     --annotation_file "$annotation_file" \
     --result_file "$result_file" \
     --output_file "$output_file"
+
 done
