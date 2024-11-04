@@ -60,8 +60,10 @@ echo "wandb_id=$wandb_id"
 
 
 for result_file in "${result_files[@]}"; do
+  result_file_dir="$(dirname "$result_file")"
+
   # Construct output file path by prefixing "output_" and changing extension to .json
-  output_file="${output_dir}/output_$(basename "${result_file%.*}").json"
+  output_file="${result_file_dir}/output_$(basename "${result_file%.*}").json"
 
   echo "Processing result file: $result_file"
   echo "Output will be saved to: $output_file"
