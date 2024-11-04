@@ -37,7 +37,7 @@ def main(args):
             image_id = int(row['image_id'])
             box = json.loads(row['box'])  # Assuming box is saved as a JSON list in the CSV file
             score = float(row['score'])
-            label = int(row['label']) + 1 # TODO: move outside of the library
+            label = int(row['label'])
 
             # Store results in the nested dictionary structure
             if image_id not in results[experiment][frame_number]:
