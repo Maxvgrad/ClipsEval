@@ -14,6 +14,7 @@ def get_args_parser():
     parser = argparse.ArgumentParser('ClipsEval', add_help=False)
     parser.add_argument('--annotation_file', type=str)
     parser.add_argument('--result_file', type=str)
+    parser.add_argument('--output_file', type=str)
     return parser
 
 
@@ -72,7 +73,11 @@ def main(args):
 
     flat_stats_result = flat_stats(stats)
 
-    print(json.dumps(flat_stats_result, indent=2))
+    json_output = json.dumps(flat_stats_result, indent=2)
+    print(json_output)
+    if args.output_file:  # Check if output_file is provided
+        with open(args.output_file, 'w') as f:
+            f.write(json_output)
 
 
 def flat_stats(stats_dict):
