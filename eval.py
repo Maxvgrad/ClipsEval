@@ -15,6 +15,7 @@ def get_args_parser():
     parser.add_argument('--annotation_file', type=str)
     parser.add_argument('--result_file', type=str)
     parser.add_argument('--output_file', type=str)
+    parser.add_argument('--group_per_experiment', action='store_true')
     return parser
 
 
@@ -59,17 +60,32 @@ def main(args):
         if experiment not in coco_evaluators_per_experiment_and_timestamp:
             coco_evaluators_per_experiment_and_timestamp[experiment] = {}
 
+        if args.group_per_experiment:
+            coco_evaluators_per_experiment_and_timestamp[experiment] = CocoEvaluator(coco)
+
         for frame_number, r in experiment_results.items():
-            if frame_number not in coco_evaluators_per_experiment_and_timestamp[experiment]:
+            if not args.group_per_experiment and frame_number not in coco_evaluators_per_experiment_and_timestamp[experiment]:
                 coco_evaluators_per_experiment_and_timestamp[experiment][frame_number] = CocoEvaluator(coco)
 
-            ce = coco_evaluators_per_experiment_and_timestamp[experiment][frame_number]
+            if not args.group_per_experiment:
+                ce = coco_evaluators_per_experiment_and_timestamp[experiment][frame_number]
+            else:
+                ce = coco_evaluators_per_experiment_and_timestamp[experiment]
+
             ce.update(r)
+
+            if not args.group_per_experiment:
+                ce.evaluate()
+                ce.accumulate()
+                ce.summarize()
+                stats[f'coco_eval_bbox_{experiment}_{frame_number}'] = ce.coco_eval['bbox'].stats.tolist()
+
+        if args.group_per_experiment:
+            ce = coco_evaluators_per_experiment_and_timestamp[experiment]
             ce.evaluate()
             ce.accumulate()
             ce.summarize()
-
-            stats[f'coco_eval_bbox_{experiment}_{frame_number}'] = ce.coco_eval['bbox'].stats.tolist()
+            stats[f'coco_eval_bbox_{experiment}'] = ce.coco_eval['bbox'].stats.tolist()
 
     flat_stats_result = flat_stats(stats)
 
